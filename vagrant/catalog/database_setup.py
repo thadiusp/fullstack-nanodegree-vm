@@ -24,7 +24,7 @@ class Movies(Base):
   year = Column(String(4))
   plot = Column(String(1000))
   poster = Column(String(250))
-  type = Column(String(80), foreign_key('genre.type'))
+  type = Column(String(80), ForeignKey('genre.type'))
   genre = relationship(Genre)
 
   @property
