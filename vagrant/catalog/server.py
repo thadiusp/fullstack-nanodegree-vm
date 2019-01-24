@@ -3,13 +3,28 @@ app = Flask(__name__)
 
 from sqlalchemy import create_engine, asc
 from sqlalchemy.orm import sessionmaker
-from database_setup import Base, Restaurant, MenuItem, User
+from database_setup import Genre, Movies, Base
 
 #Connect to database and create the session
 engine = create_engine('sqlite:///moviegenre.db')
 Base.metadata.bind = engine
 DBSession = sessionmaker(bind=engine)
 session = DBSession()
+
+#Homepage (Shows all genres)
+@app.route('/')
+@app.route('/genres')
+def showGenres():
+  genres = session.query(Genre).order_by(asc(Genre.type))
+  return render_template('genres.html', genres = genres)
+
+#Show movies in picked genre
+@app.route('/genres/<str:genre_type>/')
+@app.route('/genres/<str:genre_type>/movies/')
+def showMovies(genre_type):
+  genre = session.query(Genre).filter_by(type = genre_type).one()
+  movies = session.query(Movies).filter_by(genre_type = genre_type).all()
+  return render_template('movies.html', genre = genre, movies = movies)
 
 
 
