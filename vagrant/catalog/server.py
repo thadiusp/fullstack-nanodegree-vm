@@ -57,6 +57,19 @@ def editMovie(genre_type, movie_id):
   else:
     return render_template('editMovie.html', genre_type = genre_type, movie_id = movie_id, edit = editedMovie)
 
+#Delete movie from database
+@app.route('/genres/<genre_type>/movies/<int:movie_id>/delete/')
+def deleteMovie(genre_type, movie_id):
+  genre = session.query(Genre).filter_by(type=genre_type).one()
+  movieToDelete = session.query(Movies).filter_by(id = movie_id).one()
+  if request.method == 'POST':
+    session.delete(movieToDelete)
+    session.commit()
+    flash('Movie successfully deleted.')
+    return redirect(url_for(showMovies, genre_type = genre_type))
+  else:
+    return render_template('deleteMovie.html', delete = movieToDelete)
+
   
 
 
