@@ -19,15 +19,15 @@ def showGenres():
   return render_template('genres.html', genres = genres)
 
 #Show movies in picked genre
-@app.route('/genres/<str:genre_type>/')
-@app.route('/genres/<str:genre_type>/movies/')
+@app.route('/genres/<genre_type>/')
+@app.route('/genres/<genre_type>/movies/')
 def showMovies(genre_type):
   genre = session.query(Genre).filter_by(type = genre_type).one()
   movies = session.query(Movies).filter_by(genre_type = genre_type).all()
   return render_template('movies.html', genre = genre, movies = movies)
 
 #Add new movie to a genre catagory
-@app.route('/genres/<str:genre_type>/movies/new/')
+@app.route('/genres/<genre_type>/movies/new/')
 def newMovie(genre_type):
   if request.method == 'POST':
     newMovie = Movies(title = request.form['title'], year = request.form['year'], plot = request.form['plot'], poster = request.form['poster'], genre_type = genre_type)
