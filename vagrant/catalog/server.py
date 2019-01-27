@@ -38,6 +38,25 @@ def newMovie(genre_type):
   else:
     return render_template('newMovie.html', genre_type = genre_type)
 
+#Edit movie information
+@app.route('/genres/<genre_type>/movies/<int:movie_id>/edit/')
+def editMovie(genre_type, movie_id):
+  editedMovie = session.query(Movies).filter_by(id = movie_id).one()
+  genre = session.query(Genre).filter_by(type = genre_type).one()
+  if request.method == 'POST':
+    if request.form['title']:
+      editedMovie.title = request.form['title']
+    if request.form['year']:
+      editedMovie.year = request.form['year']
+    if request.form['plot']:
+      editedMovie.plot = request.form['plot']
+    session.add(editedMovie)
+    session.commit()
+    flash('Movie has been updated.')
+    return redirect(url_for('showMovies', genre_type = genre_type))
+  else:
+    return render_template('editMovie.html', genre_type = genre_type, movie_id = movie_id, edit = editedMovie)
+
   
 
 
