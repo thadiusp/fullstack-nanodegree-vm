@@ -55,7 +55,7 @@ def editMovie(genre_type, movie_id):
     flash('Movie has been updated.')
     return redirect(url_for('showMovies', genre_type = genre_type))
   else:
-    return render_template('editMovie.html', genre_type = genre_type, movie_id = movie_id, edit = editedMovie)
+    return render_template('editMovie.html', edit=editedMovie, genre=genre)
 
 #Delete movie from database
 @app.route('/genres/<genre_type>/movies/<int:movie_id>/delete/')
