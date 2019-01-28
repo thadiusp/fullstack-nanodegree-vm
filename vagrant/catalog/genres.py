@@ -24,6 +24,13 @@ genre1 = Genre(type="Action")
 session.add(genre1)
 session.commit()
 
+movie1 = Movies(title="John Wick", year="2014", 
+plot="An ex-hit-man comes out of retirement to track down the gangsters that killed his dog and took everything from him.", 
+poster="https://m.media-amazon.com/images/M/MV5BMTU2NjA1ODgzMF5BMl5BanBnXkFtZTgwMTM2MTI4MjE@._V1_SX300.jpg")
+
+session.add(movie1)
+session.commit()
+
 genre2 = Genre(type="Adventure")
 
 session.add(genre2)
