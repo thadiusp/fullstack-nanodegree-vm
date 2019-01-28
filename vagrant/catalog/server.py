@@ -23,7 +23,7 @@ def showGenres():
 @app.route('/genres/<genre_type>/movies/')
 def showMovies(genre_type):
   genre = session.query(Genre).filter_by(type = genre_type).one()
-  movies = session.query(Movies).filter_by(genre_type = genre_type).all()
+  movies = session.query(Movies).filter_by(id = genre.id).all()
   return render_template('movies.html', genre = genre, movies = movies)
 
 #Add new movie to a genre catagory
