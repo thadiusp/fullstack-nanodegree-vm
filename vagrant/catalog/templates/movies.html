@@ -11,8 +11,8 @@
         <h4>{{movie.year}}</h4>
         <img src="{{movie.poster}}">
         <p>{{movie.plot}}</p>
-        <a href='{{url_for('editMovie', edit=editedMovie, genre=genre}}''>Edit</a>
-        <a href='{{url_for('deleteMovie', delete=delete}}''>Delete</a>
+        <a href='{{url_for('editMovie', movie_id=movie.id, genre_type=genre.type)}}'>Edit</a>
+        <a href='{{url_for('deleteMovie', movie_id=movie.id, genre_type=genre.type)}}'>Delete</a>
         {% endfor %}
         {% endblock %}
 
