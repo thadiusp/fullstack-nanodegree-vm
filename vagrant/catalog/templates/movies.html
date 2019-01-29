@@ -3,6 +3,7 @@
 
 
 <h1><a href='{{url_for('showGenres')}}'>{{genre.type}}</a></h1>
+<a href='{{url_for('newMovie', genre_type=genre.type)}}'>Add a New Movie</a>
 <div class="row">
     <div class="col-md-1"></div>
     <div class="col-md-3">
