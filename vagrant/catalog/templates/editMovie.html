@@ -1,0 +1,25 @@
+{% extends "main.html" %}
+{% block content %}
+
+<h1>Edit {{edit.title}}: </h1>
+
+<form action="#" method="post">
+    <div class="form-group">
+        <label for="title">Title:</label>
+        <input type="text" maxlength="250" class="form-control" name="title" value="{{edit.title}}">
+        <label for="year">Year:</label>
+        <input type="text" maxlength="4" class="form-control" name="year" value="{{edit.year}}">
+        <label for="plot">Plot:</label>
+        <textarea name="plot" maxlength="250" cols="30" rows="7">{{edit.plot}}</textarea>
+        <button type="submit" id="submit" class="btn btn-default">
+            <span glass="glyphicon glyphicon-ok" aria-hidden="true"></span>Save
+        </button>
+        <a href='{{url_for('showMovies', genre_type = genre.type)}}''>
+            <button class="btn btn-default delete">
+                <span glass="glyphicon glyphicon-ok" aria-hidden="true"></span>Cancel
+            </button>
+        </a>
+    </div>
+</form>
+
+{% endblock %}
