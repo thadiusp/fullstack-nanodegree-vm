@@ -66,9 +66,9 @@ def deleteMovie(genre_type, movie_id):
     session.delete(movieToDelete)
     session.commit()
     flash('Movie successfully deleted.')
-    return redirect(url_for(showMovies, genre_type = genre_type))
+    return redirect(url_for('showMovies', genre_type = genre_type))
   else:
-    return render_template('deleteMovie.html', delete = movieToDelete)
+    return render_template('deleteMovie.html', delete = movieToDelete, genre=genre)
 
   
 
