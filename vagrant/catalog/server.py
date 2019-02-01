@@ -27,7 +27,7 @@ def showMovies(genre_type):
   return render_template('movies.html', genre = genre, movies = movies)
 
 #Add new movie to a genre catagory
-@app.route('/genres/<genre_type>/movies/new/')
+@app.route('/genres/<genre_type>/movies/new/', methods=['GET', 'POST'])
 def newMovie(genre_type):
   if request.method == 'POST':
     newMovie = Movies(title = request.form['title'], year = request.form['year'], plot = request.form['plot'], poster = request.form['poster'], genre_type = genre_type)
@@ -39,7 +39,7 @@ def newMovie(genre_type):
     return render_template('newMovie.html', genre_type = genre_type)
 
 #Edit movie information
-@app.route('/genres/<genre_type>/movies/<int:movie_id>/edit/')
+@app.route('/genres/<genre_type>/movies/<int:movie_id>/edit/', methods=['GET', 'POST'])
 def editMovie(genre_type, movie_id):
   editedMovie = session.query(Movies).filter_by(id = movie_id).one()
   genre = session.query(Genre).filter_by(type = genre_type).one()
@@ -58,7 +58,7 @@ def editMovie(genre_type, movie_id):
     return render_template('editMovie.html', edit=editedMovie, genre=genre)
 
 #Delete movie from database
-@app.route('/genres/<genre_type>/movies/<int:movie_id>/delete/')
+@app.route('/genres/<genre_type>/movies/<int:movie_id>/delete/', methods=['GET', 'POST'])
 def deleteMovie(genre_type, movie_id):
   genre = session.query(Genre).filter_by(type=genre_type).one()
   movieToDelete = session.query(Movies).filter_by(id = movie_id).one()
