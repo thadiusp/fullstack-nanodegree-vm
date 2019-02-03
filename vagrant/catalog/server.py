@@ -23,14 +23,15 @@ def showGenres():
 @app.route('/genres/<genre_type>/movies/')
 def showMovies(genre_type):
   genre = session.query(Genre).filter_by(type = genre_type).one()
-  movies = session.query(Movies).filter_by(id = genre.id).all()
+  movies = session.query(Movies).filter_by(type = genre_type).all()
   return render_template('movies.html', genre = genre, movies = movies)
 
 #Add new movie to a genre catagory
 @app.route('/genres/<genre_type>/movies/new/', methods=['GET', 'POST'])
 def newMovie(genre_type):
   if request.method == 'POST':
-    newMovie = Movies(title = request.form['title'], year = request.form['year'], plot = request.form['plot'], poster = request.form['poster'], genre_type = genre_type)
+    genre = session.query(Genre).filter_by(type = genre_type).one()
+    newMovie = Movies(title = request.form['title'], year = request.form['year'], plot = request.form['plot'], poster = request.form['poster'], type = genre_type)
     session.add(newMovie)
     session.commit()
     flash('%s was added to the list successfully' % newMovie.title)
