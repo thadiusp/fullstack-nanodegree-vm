@@ -26,6 +26,8 @@ class Movies(Base):
   poster = Column(String(250))
   type = Column(String(80), ForeignKey('genre.type'))
   genre = relationship(Genre)
+  user_id = Column(String(250), ForeignKey('user.id'))
+  user = relationship(User)
 
   @property
   def serialize(self):
@@ -37,6 +39,21 @@ class Movies(Base):
       'poster': self.poster
     }
 
+class User(Base):
+  id = Column(Integer, primary_key=True)
+  name = Column(String(250), nullable=False)
+  email = Column(String(250), nullable=False)
+  picture = Column(String(250))
+
+  @property
+  def serialize(self):
+    return {
+      'id': self.id,
+      'name': self.name,
+      'emai': self.email,
+      'picture': self.picture
+    }
+    
 engine = create_engine('sqlite:///moviegenre.db')
 
 Base.metadata.create_all(engine)
