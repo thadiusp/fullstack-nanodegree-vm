@@ -30,7 +30,7 @@ def showLogin():
   login_session['state'] = state
   return render_template('login.html', state=state)
 
-@app.rout('/gconnect', methods=['POST'])
+@app.route('/gconnect', methods=['POST'])
 def gconnect():
   if request.args.get('state') != login_session['state']:
     return jsonify('Invalid state parimeter'), 401
