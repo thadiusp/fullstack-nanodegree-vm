@@ -3,7 +3,7 @@ app = Flask(__name__)
 
 from sqlalchemy import create_engine, asc
 from sqlalchemy.orm import sessionmaker
-from database_setup import Genre, Movies, Base
+from database_setup import Genre, Movies, User, Base
 
 #Oauth imports
 from flask import session as login_session
