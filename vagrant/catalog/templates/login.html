@@ -1,5 +1,7 @@
 <html>
 
+<script src="https://apis.google.com/js/platform.js?onload=start"></script>
+
 <head>
 
 </head>
@@ -14,7 +16,20 @@
   <div id="result"></div>
 
   <script>
+    function signInCallBack(authResult) {
+      if (authResult['code']) {
+        document.getElementById('signInButton').setAttribute('style', 'display:none');
 
+        fetch('/gconnect?state={{state}}', {
+          method: 'POST',
+          credentials: 'same-origin',
+          headers: {
+            'Content-type': 'application/octet-stream; charset=utf-8'
+          }
+
+        })
+      }
+    }
   </script>
 </body>
 
