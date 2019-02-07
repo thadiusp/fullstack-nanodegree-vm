@@ -153,11 +153,17 @@ def showGenres():
 def showMovies(genre_type):
   genre = session.query(Genre).filter_by(type = genre_type).one()
   movies = session.query(Movies).filter_by(type = genre_type).all()
-  return render_template('movies.html', genre = genre, movies = movies)
+  contributor = getUserInfo(movies.user_id)
+  if 'username' not in login_session or contributor.id != login_session['user_id']:
+    return render_template('publicMovies.html', genre = genre, movies = movies, contributor = contributor)
+  else:
+    return render_template('movies.html', genre = genre, movies = movies, contributor = contributor)
 
 #Add new movie to a genre catagory
 @app.route('/genres/<genre_type>/movies/new/', methods=['GET', 'POST'])
 def newMovie(genre_type):
+  if 'username' not in login_session:
+    return redirect('/login')
   if request.method == 'POST':
     genre = session.query(Genre).filter_by(type = genre_type).one()
     newMovie = Movies(title = request.form['title'], year = request.form['year'], plot = request.form['plot'], poster = request.form['poster'], type = genre_type)
@@ -173,6 +179,10 @@ def newMovie(genre_type):
 def editMovie(genre_type, movie_id):
   editedMovie = session.query(Movies).filter_by(id = movie_id).one()
   genre = session.query(Genre).filter_by(type = genre_type).one()
+  if 'username' not in login_session:
+    return redirect('/login')
+  if editedMovie.user_id != login_session['user_id']:
+    return "<script>function alert() {alert('You are not Authorized to edit this movie.');}</script><body onload='alert()'>"
   if request.method == 'POST':
     if request.form['title']:
       editedMovie.title = request.form['title']
@@ -192,6 +202,10 @@ def editMovie(genre_type, movie_id):
 def deleteMovie(genre_type, movie_id):
   genre = session.query(Genre).filter_by(type=genre_type).one()
   movieToDelete = session.query(Movies).filter_by(id = movie_id).one()
+  if 'username' not in login_session:
+    return redirect('/login')
+  if deleteMovie.user_id != login_session['user_id']:
+    return "<script>function alert() {alert('You are not Authorized to delete this movie.');}</script><body onload='alert()'>"
   if request.method == 'POST':
     session.delete(movieToDelete)
     session.commit()
