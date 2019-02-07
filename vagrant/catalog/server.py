@@ -157,7 +157,7 @@ def showMovies(genre_type):
   if 'username' not in login_session or contributor.id != login_session['user_id']:
     return render_template('publicMovies.html', genre = genre, movies = movies, contributor = contributor)
   else:
-    return render_template('movies.html', genre = genre, movies = movies, contributor = contributor)
+    return render_template('movies.html', genre = genre, movies = movies, contributor = con)
 
 #Add new movie to a genre catagory
 @app.route('/genres/<genre_type>/movies/new/', methods=['GET', 'POST'])
