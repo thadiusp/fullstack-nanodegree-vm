@@ -27,6 +27,8 @@ class Genre(Base):
     __tablename__ = 'genre'
     id = Column(Integer, primary_key=True)
     type = Column(String(250), nullable=False)
+    user_id = Column(Integer, ForeignKey('user.id'))
+    user = relationship(User)
 
     @property
     def serialize(self):
