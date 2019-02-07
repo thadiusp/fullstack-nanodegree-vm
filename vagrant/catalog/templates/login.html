@@ -1,0 +1,48 @@
+<html>
+
+<script src="https://apis.google.com/js/platform.js?onload=start"></script>
+
+<head>
+
+</head>
+
+<body>
+  <div id="signInButton">
+    <span class="g-signin" data-scope="openid email" data-clientid="594564265839-otg0d6l54um60kebndns7t3fnonqi7ph.apps.googleusercontent.com"
+      data-redirecturi="postmessage" data-accesstype="offline" data-cookiepolicy="single_host_origin" data-callback="signInCallBack"
+      data-approvalprompt="force">
+    </span>
+  </div>
+  <div id="result"></div>
+
+  <script>
+    function signInCallBack(authResult) {
+      if (authResult['code']) {
+        document.getElementById('signInButton').setAttribute('style', 'display:none');
+
+        fetch('/gconnect?state={{state}}', {
+          method: 'POST',
+          credentials: 'same-origin',
+          headers: {
+            'Content-type': 'application/octet-stream; charset=utf-8'
+          },
+          body: JSON.stringify(authResult['code']),
+        })
+        .then(function(result){
+            if (result) {
+                document.getElementById('result').innerHTML = `Login Successful!<br> ${result} <br>Redirecting...`
+                setTimeout(function(){
+                    window.location.href = "/genres";
+                }, 3000)
+            } else if (authResult['error']) {
+                console.log(`There was an error: ${authResult['error']}`);
+            } else {
+                document.getElementById('result').innerHTML = `Server side call failed. Check your configuration and console.`;
+            }
+        })
+      }
+    }
+  </script>
+</body>
+
+</html>
