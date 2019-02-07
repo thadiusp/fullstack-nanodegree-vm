@@ -1,0 +1,24 @@
+{% extends 'main.html' %}
+{% block content %}
+{% include "header.html" %}
+
+
+<h1><a href='{{url_for('showGenres')}}'>{{genre.type}}</a></h1>
+<div class="row">
+    <div class="col-md-1"></div>
+    <div class="col-md-3">
+        {% for movie in movies %}
+        <h2>{{movie.title}} <font size="3.5px">({{movie.year}})</font>
+        </h2>
+        <!--<h5>({{movie.year}})</h5>-->
+        <img src="{{movie.poster}}" width="182px" height="268px">
+        <p>{{movie.plot}}</p>
+        {% endfor %}
+        {% endblock %}
+
+
+
+
+
+    </div>
+</div>
