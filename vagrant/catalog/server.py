@@ -2,7 +2,7 @@ from flask import Flask, render_template, request, redirect, jsonify, url_for, f
 app = Flask(__name__)
 
 from sqlalchemy import create_engine, asc
-from sqlalchemy.orm import sessionmaker
+from sqlalchemy.orm import sessionmaker, scoped_session
 from database_setup import Genre, Movies, User, Base
 
 #Oauth imports
@@ -21,7 +21,7 @@ CLIENT_ID = json.loads(open('client_secret.json', 'r').read())['web']['client_id
 engine = create_engine('sqlite:///moviegenre.db')
 Base.metadata.bind = engine
 DBSession = sessionmaker(bind=engine)
-session = DBSession()
+session = scoped_session(DBSession)
 
 #Create token and store in login session
 @app.route('/login')
@@ -33,9 +33,9 @@ def showLogin():
 @app.route('/gconnect', methods=['POST'])
 def gconnect():
   if request.args.get('state') != login_session['state']:
-    return jsonify('Invalid state parimeter'), 401
+    return jsonify('Invalid state perimeter'), 401
   #Obtain authorization code
-  code = request.database
+  code = request.data
 
   try:
     #Upgrade authorization code to a credentials object
@@ -66,7 +66,7 @@ def gconnect():
 
   #Check if user is already logged in
   stored_credentials = login_session.get('access_token')
-  stored_google_id = login_session.get('goole_id')
+  stored_google_id = login_session.get('google_id')
   if stored_credentials is not None and google_id == stored_google_id:
     return jsonify('Current user is already connected'), 200
 
@@ -158,7 +158,7 @@ def showMovies(genre_type):
   else:
     return render_template('movies.html', genre = genre, movies = movies, contributor = contributor)
 
-#Add new movie to a genre catagory
+#Add new movie to a genre category
 @app.route('/genres/<genre_type>/movies/new/', methods=['GET', 'POST'])
 def newMovie(genre_type):
   if 'username' not in login_session:
