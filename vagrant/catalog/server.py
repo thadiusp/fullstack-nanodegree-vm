@@ -118,27 +118,26 @@ def getUserID(email):
   except:
     return None
 
+@app.route('/gdisconnect')
+def gdisconnect():
+  access_token = login_session.get('access_token')
+  if access_token is None:
+    return jsonify('Current user is not logged in.'), 401
 
+  url = ('https://accounts.google.com/o/oauth2/revoke?token=%s' % login_session['access_token'])
+  h = httplib2.Http()
+  result = h.request(url, 'GET')[0]
 
+  if result['status'] == '200':
+    del login_session['access_token']
+    del login_session['google_id']
+    del login_session['username']
+    del login_session['email']
+    del login_session['picture']
+    return jsonify('Successfully logged out.'), 200
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+  else:
+    return jsonify('Failed to revoke user token'), 400
 
 #Homepage (Shows all genres)
 @app.route('/')
@@ -157,7 +156,7 @@ def showMovies(genre_type):
   if 'username' not in login_session or contributor.id != login_session['user_id']:
     return render_template('publicMovies.html', genre = genre, movies = movies, contributor = contributor)
   else:
-    return render_template('movies.html', genre = genre, movies = movies, contributor = con)
+    return render_template('movies.html', genre = genre, movies = movies, contributor = contributor)
 
 #Add new movie to a genre catagory
 @app.route('/genres/<genre_type>/movies/new/', methods=['GET', 'POST'])
