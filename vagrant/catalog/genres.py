@@ -59,7 +59,7 @@ session.add(movie1)
 session.commit()
 
 movie2 = Movies(user_id=1, title='Blockers', year='2018',
-                plot="Three parents try to stop their daughters from losing their virginity on prom night."
+                plot="Three parents try to stop their daughters from losing their virginity on prom night.",
                 poster="https://m.media-amazon.com/images/M/MV5BMjE0ODIzNjkzMl5BMl5BanBnXkFtZTgwODQ3MzU4NDM@._V1_SX300.jpg")
 session.add(movie2)
 session.commit()
