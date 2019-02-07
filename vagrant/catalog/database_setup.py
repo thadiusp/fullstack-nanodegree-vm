@@ -45,7 +45,7 @@ class Movies(Base):
     poster = Column(String(250))
     type = Column(String(80), ForeignKey('genre.type'))
     genre = relationship(Genre)
-    user_id = Column(String(250), ForeignKey('user.id'))
+    user_id = Column(Integer, ForeignKey('user.id'))
     user = relationship(User)
 
     @property
