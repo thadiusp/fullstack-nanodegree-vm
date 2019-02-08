@@ -1,0 +1,14 @@
+.navbar {
+    background-color: #141b41;
+    color: #e8e9f3;
+}
+
+#signInButton {
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+}
+.wrapper {
+    display: grid;
+    grid-template-columns: repeat(4, 1fr);
+}
