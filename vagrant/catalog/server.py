@@ -135,9 +135,22 @@ def gdisconnect():
     del login_session['email']
     del login_session['picture']
     return jsonify('Successfully logged out.'), 200
-
   else:
     return jsonify('Failed to revoke user token'), 400
+
+#JSON api routes
+#List all the movies in specified genre
+@app.route('/genres/<genre_type>/movies/JSON')
+def genreListJSON(genre_type):
+  genre = session.query(Genre).filter_by(type = genre_type).one()
+  movies = session.query(Movies).filter_by(type = genre_type).all()
+  return jsonify(MovieList = [m.serialize for m in movies])
+
+#Show the JSON for a specified movie
+@app.route('/genres/<genre_type>/movies/<int:movie_id>/JSON')
+def movieJSON(genre_type, movie_id):
+  movie = session.query(Movies).filter_by(id = movie_id).one()
+  return jsonify(movie = movie.serialize)
 
 #Homepage (Shows all genres)
 @app.route('/')
