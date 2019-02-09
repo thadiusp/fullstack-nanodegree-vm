@@ -20,7 +20,7 @@
 
         fetch('/gconnect?state={{state}}', {
             method: 'POST',
-            credentials: 'include',
+            credentials: 'same-origin',
             processdata: false,
             headers: {
               'Content-type': 'application/octet-stream; charset=utf-8'
