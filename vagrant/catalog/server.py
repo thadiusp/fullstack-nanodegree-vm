@@ -15,7 +15,7 @@ import json
 from flask import make_response
 import requests
 
-CLIENT_ID = json.loads(open('client_secret.json', 'r').read())['web']['client_id']
+CLIENT_ID = json.loads(open('client_secrets.json', 'r').read())['web']['client_id']
 
 #Connect to database and create the session
 engine = create_engine('sqlite:///moviegenre.db')
@@ -39,14 +39,18 @@ def gconnect():
 
   try:
     #Upgrade authorization code to a credentials object
-    oauth_flow = flow_from_clientsecrets('client_secret.json', scope='')
+    oauth_flow = flow_from_clientsecrets('client_secrets.json', scope='')
+    print('oauth flow: %s' % oauth_flow)
     oauth_flow.redirect_uri = 'postmessage'
     credentials = oauth_flow.step2_exchange(code)
+    print('This is a control print statement')
+    print('credentials: %s' % credentials)
   except FlowExchangeError:
     return jsonify('Failed to upgrade the authorization code'), 401
 
   #Check the validity of the access_code
   access_token = credentials.access_token
+  print('access token: %s' % access_token)
   url = ('https://www.googleapis.com/oauth2/v1/tokeninfo?access_token=%s' % access_token)
   h = httplib2.Http()
   result = json.loads(h.request(url, 'GET')[1].decode('utf-8'))
