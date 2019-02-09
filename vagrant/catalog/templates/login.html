@@ -1,10 +1,8 @@
 <html>
-
-<script src="https://apis.google.com/js/platform.js?onload=start"></script>
-<link rel=stylesheet type=text/css href="{{ url_for('static', filename='styles.css') }}">
-
-<head>
-
+  <head>
+    <script src="//ajax.googleapis.com/ajax/libs/jquery/1.8.2/jquery.min.js"></script>
+    <script src="https://apis.google.com/js/platform.js?onload=start"></script>
+    <link rel=stylesheet type=text/css href="{{ url_for('static', filename='styles.css') }}">
 </head>
 
 <body>
@@ -19,28 +17,25 @@
   <script>
     function signInCallBack(authResult) {
       if (authResult['code']) {
-        document.getElementById('signInButton').setAttribute('style', 'display:none');
-
-        fetch('/gconnect?state={{state}}', {
-          method: 'POST',
-          credentials: 'same-origin',
-          processdata: false,
-          headers: {
-            'Content-type': 'application/octet-stream; charset=utf-8'
-          },
-          body: JSON.stringify(authResult['code']),
-        })
-        .then(function(result){
+        $('#signInButton').attr('style', 'display:none');
+        $.ajax({
+          type: 'POST',
+          url: '/gconnect?state={{state}}',
+          processData: false,
+          contentType: 'application/octet-stream; charset=utf-8',
+          data: authResult['code'],
+          success: function (result) {
             if (result) {
-                document.getElementById('result').innerHTML = `Login Successful!<br>Redirecting...`
-                setTimeout(function(){
-                    window.location.href = "/genres";
-                }, 3000)
+              $('#result').html('Login Successful!</br>' + result + '</br> Redirecting...')
+              setTimeout(function () {
+                window.location.href = '/genres'
+              }, 3000);
             } else if (authResult['error']) {
-                console.log(`There was an error: ${authResult['error']}`);
+              console.log('There was an error: ' + authResult['error']);
             } else {
-                document.getElementById('result').innerHTML = `Server side call failed. Check your configuration and console.`;
+              $('#result').html('Failed to make a server-side call.')
             }
+          }
         })
       }
     }
