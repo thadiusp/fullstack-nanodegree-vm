@@ -34,14 +34,18 @@ def showLogin():
 def gconnect():
   if request.args.get('state') != login_session['state']:
     return jsonify('Invalid state perimeter'), 401
+    
   #Obtain authorization code
   code = request.data
+  print('This is the code: %s' % code)
 
   try:
     #Upgrade authorization code to a credentials object
     oauth_flow = flow_from_clientsecrets('client_secret.json', scope='')
+    print('This is the oauth flow: %s' % oauth_flow)
     oauth_flow.redirect_uri = 'postmessage'
     credentials = oauth_flow.step2_exchange(code)
+    print('This is the credentials: %s' % credentials)
   except FlowExchangeError:
     return jsonify('Failed to upgrade the authorization code'), 401
 
@@ -50,13 +54,15 @@ def gconnect():
   url = ('https://www.googleapis.com/oauth2/v1/tokeninfo?access_token=%s' % access_token)
   h = httplib2.Http()
   result = json.loads(h.request(url, 'GET')[1].decode('utf-8'))
-
+  
   #Abort if access token error
   if result.get('error') is not None:
+    print(result.get)
     return jsonify('Error'), 500
 
   #Verify access token is used for intended user
   google_id = credentials.id_token['sub']
+  print('This is my google id: %s' % google_id)
   if result['user_id'] != google_id:
     return jsonify('Token users id does not match given user id'), 401
 
@@ -67,6 +73,7 @@ def gconnect():
   #Check if user is already logged in
   stored_credentials = login_session.get('access_token')
   stored_google_id = login_session.get('google_id')
+  
   if stored_credentials is not None and google_id == stored_google_id:
     return jsonify('Current user is already connected'), 200
 
