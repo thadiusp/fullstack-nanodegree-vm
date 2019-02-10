@@ -15,7 +15,7 @@ import json
 from flask import make_response
 import requests
 
-CLIENT_ID = json.loads(open('client_secret.json', 'r').read())['web']['client_id']
+CLIENT_ID = json.loads(open('client_secrets.json', 'r').read())['web']['client_id']
 
 #Connect to database and create the session
 engine = create_engine('sqlite:///moviegenre.db')
@@ -30,100 +30,103 @@ def showLogin():
   login_session['state'] = state
   return render_template('login.html', state=state)
 
+
 @app.route('/gconnect', methods=['POST'])
 def gconnect():
-  if request.args.get('state') != login_session['state']:
-    return jsonify('Invalid state perimeter'), 401
+    if request.args.get('state') != login_session['state']:
+        return jsonify('Invalid state parameter'), 401
+    #Obtain authorization code
+    code = request.data
+
+    try:
+        #Upgrade the authorization code into a credentials object
+        oauth_flow = flow_from_clientsecrets('client_secrets.json', scope='')
+        oauth_flow.redirect_uri = 'postmessage'
+        credentials = oauth_flow.step2_exchange(code)
+    except FlowExchangeError:
+        return jsonify('Failed to upgrade the authorization code.'), 401
+
+    #Check access token validity
+    access_token = credentials.access_token
+    url = ('https://www.googleapis.com/oauth2/v1/tokeninfo?access_token=%s' %
+           access_token)
+    h = httplib2.Http()
+    result = json.loads(h.request(url, 'GET')[1].decode('utf-8'))
+
+    #If there was an error in the access token info, abort.
+    if result.get('error') is not None:
+        return jsonify(result.get('error')), 500
+
+    #Verify that the access token is used for the intended user.
+    google_id = credentials.id_token['sub']
+    if result['user_id'] != google_id:
+        return jsonify("Token's user ID doesn't match given user ID."), 401
+
+    #Verify that the access token is valid for this app.
+    if result['issued_to'] != CLIENT_ID:
+        return jsonify("Token's client ID doesn't match app's."), 401
+
+    #Check to see if user is already logged in
+    stored_credentials = login_session.get('access_token')
+    stored_google_id = login_session.get('google_id')
+
+    if stored_credentials is not None and google_id == stored_google_id:
+        return jsonify('Current user is already connected.'), 200
+
+    #Store the access token in the session for later use.
+    login_session['access_token'] = credentials.access_token
+    login_session['google_id'] = google_id
+
+    #Get user info
+    userinfo_url = "https://www.googleapis.com/oauth2/v3/userinfo"
+    params = {'access_token': credentials.access_token, 'alt': 'json'}
+    answer = requests.get(userinfo_url, params=params)
+    print('the answer is: %s' % answer)
+    data = answer.json()
+    print('the data is: %s' % data)
+
     
-  #Obtain authorization code
-  code = request.data
-  print('This is the code: %s' % code)
+    login_session['username'] = data['name']
+    login_session['picture'] = data['picture']
+    login_session['email'] = data['email']
 
-  try:
-    #Upgrade authorization code to a credentials object
-    oauth_flow = flow_from_clientsecrets('client_secret.json', scope='')
-    print('This is the oauth flow: %s' % oauth_flow)
-    oauth_flow.redirect_uri = 'postmessage'
-    credentials = oauth_flow.step2_exchange(code)
-    print('This is the credentials: %s' % credentials)
-  except FlowExchangeError:
-    return jsonify('Failed to upgrade the authorization code'), 401
+    user_id = getUserID(login_session['email'])
+    if not user_id:
+        user_id = createUser(login_session)
+    login_session['user_id'] = user_id
 
-  #Check the validity of the access_code
-  access_token = credentials.access_token
-  url = ('https://www.googleapis.com/oauth2/v1/tokeninfo?access_token=%s' % access_token)
-  h = httplib2.Http()
-  result = json.loads(h.request(url, 'GET')[1].decode('utf-8'))
-  
-  #Abort if access token error
-  if result.get('error') is not None:
-    print(result.get)
-    return jsonify('Error'), 500
+    output = ''
+    output += '<h1>Welcome'
+    output += login_session['username']
+    output += '!</h1>'
+    output += '<img src="'
+    output += login_session['picture']
+    output += '" style="width: 150px; height: 150px; border-radius: 150px; -webkit-border-radius: 150px; -moz=border-radius: 150px;">'
+    flash("You are now logged in as %s" % login_session['username'])
+    print("Done!")
+    return output
 
-  #Verify access token is used for intended user
-  google_id = credentials.id_token['sub']
-  print('This is my google id: %s' % google_id)
-  if result['user_id'] != google_id:
-    return jsonify('Token users id does not match given user id'), 401
-
-  #Verify app validity for this access token
-  if result['issued_to'] != CLIENT_ID:
-    return jsonify('Token client ID does not match App'), 401
-
-  #Check if user is already logged in
-  stored_credentials = login_session.get('access_token')
-  stored_google_id = login_session.get('google_id')
-  
-  if stored_credentials is not None and google_id == stored_google_id:
-    return jsonify('Current user is already connected'), 200
-
-  #Store the access token for later session usage
-  login_session['access_token'] = credentials.access_token
-  login_session['google_id'] = google_id
-
-  #Gather Users info
-  userinfo_url = "https://www.googleapis.com/oauth2/v3/userinfo"
-  params = {'access_token': credentials.access_token, 'alt':'json'}
-  answer = requests.get(userinfo_url, params=params)
-  data = answer.json()
-
-  login_session['username'] = data['name']
-  login_session['picture'] = data['picture']
-  login_session['email'] = data['email']
-
-  user_id = getUserID(login_session['email'])
-  if not user_id:
-    user_id = createUser(login_session)
-  login_session['user_id'] = user_id
-
-  output = ''
-  output += '<h1>Welcome'
-  output += login_session['username']
-  output += '!</h1>'
-  output += '<img src="'
-  output += login_session['picture']
-  output += '" style="width: 150px; height: 150px; border-radius: 150px; -webkit-border-radius: 150px; -moz=border-radius: 150px;">'
-  flash("You are now logged in as %s" % login_session['username'])
-  return output
-
-#Create a user
+# Create a new user.
 def createUser(login_session):
-  newUser = User(name=login_session['username'], email=login_session['email'], picture=login_session['picture'])
-  session.add(newUser)
-  session.commit()
-  user = session.query(User).filter_by(email=login_session['email']).one()
-  return user.id
+    newUser = User(name=login_session['username'],
+                   email=login_session['email'], picture=login_session['picture'])
+    session.add(newUser)
+    session.commit()
+    user = session.query(User).filter_by(email=login_session['email']).one()
+    return user.id
 
+# Get new users info.
 def getUserInfo(user_id):
-  user = session.query(User).filter_by(id=user_id).one()
-  return user
+    user = session.query(User).filter_by(id=user_id).one()
+    return user
+
 
 def getUserID(email):
-  try:
-    user = session.query(User).filter_by(email=email).one()
-    return user
-  except:
-    return None
+    try:
+        user = session.query(User).filter_by(email=email).one()
+        return user.id
+    except:
+        return None
 
 @app.route('/gdisconnect')
 def gdisconnect():
@@ -164,7 +167,10 @@ def movieJSON(genre_type, movie_id):
 @app.route('/genres')
 def showGenres():
   genres = session.query(Genre).order_by(asc(Genre.type))
-  return render_template('genres.html', genres = genres)
+  if 'username' not in login_session:
+    return render_template('genres.html', genres=genres)
+  else:
+    return render_template('logoutgenres.html', genres=genres)
 
 #Show movies in picked genre
 @app.route('/genres/<genre_type>/')
