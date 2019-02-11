@@ -1,0 +1,20 @@
+{% extends 'main.html' %}
+{% block content %}
+{% include "logoutheader.html" %}
+
+
+<h1><a href='{{url_for('showGenres')}}'>{{genre.type}}</a></h1>
+<a href='{{url_for('newMovie', genre_type=genre.type)}}'>Add a new Movie</a>
+<div class="row">
+    <div style="display: grid; grid-template-columns: repeat(4, 1fr); grid-template-rows: auto; grid-gap: 15px;">
+        {% for movie in movies %}
+        <div>
+            <h2>{{movie.title}} <font size="3.5px">({{movie.year}})</font>
+            </h2>
+            <img src="{{movie.poster}}" width="182px" height="268px">
+            <p>{{movie.plot}}</p>
+        </div>
+        {% endfor %}
+        {% endblock %}
+    </div>
+</div>
