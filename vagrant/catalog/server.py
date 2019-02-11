@@ -86,7 +86,7 @@ def gconnect():
     print('the data is: %s' % data)
 
     
-    login_session['username'] = data['name']
+    login_session['username'] = data.get('name', 'friend')
     login_session['picture'] = data['picture']
     login_session['email'] = data['email']
 
@@ -96,7 +96,7 @@ def gconnect():
     login_session['user_id'] = user_id
 
     output = ''
-    output += '<h1>Welcome'
+    output += '<h1>Welcome '
     output += login_session['username']
     output += '!</h1>'
     output += '<img src="'
@@ -177,12 +177,14 @@ def showGenres():
 @app.route('/genres/<genre_type>/movies/')
 def showMovies(genre_type):
   genre = session.query(Genre).filter_by(type = genre_type).one()
-  contributor = getUserInfo(genre.user_id)
+  contributor = getUserInfo(login_session['user_id'])
   movies = session.query(Movies).filter_by(type = genre_type).all()
-  if 'username' not in login_session or contributor.id != login_session['user_id']:
+  if 'username' not in login_session:
     return render_template('publicMovies.html', genre = genre, movies = movies, contributor = contributor)
+  elif 'username' in login_session and contributor.id == login_session['user_id']:
+    return render_template('movies.html', genre=genre, movies=movies, contributor=contributor)
   else:
-    return render_template('movies.html', genre = genre, movies = movies, contributor = contributor)
+    return render_template('addMovie.html', genre = genre, movies = movies, contributor = contributor)
 
 #Add new movie to a genre category
 @app.route('/genres/<genre_type>/movies/new/', methods=['GET', 'POST'])
@@ -191,7 +193,8 @@ def newMovie(genre_type):
     return redirect('/login')
   if request.method == 'POST':
     genre = session.query(Genre).filter_by(type = genre_type).one()
-    newMovie = Movies(title = request.form['title'], year = request.form['year'], plot = request.form['plot'], poster = request.form['poster'], type = genre_type)
+    user_id = getUserInfo(login_session['user_id'])
+    newMovie = Movies(title = request.form['title'], year = request.form['year'], plot = request.form['plot'], poster = request.form['poster'], type = genre_type, user_id = user_id.id)
     session.add(newMovie)
     session.commit()
     flash('%s was added to the list successfully' % newMovie.title)
@@ -229,7 +232,7 @@ def deleteMovie(genre_type, movie_id):
   movieToDelete = session.query(Movies).filter_by(id = movie_id).one()
   if 'username' not in login_session:
     return redirect('/login')
-  if deleteMovie.user_id != login_session['user_id']:
+  if movieToDelete.user_id != login_session['user_id']:
     return "<script>function alert() {alert('You are not Authorized to delete this movie.');}</script><body onload='alert()'>"
   if request.method == 'POST':
     session.delete(movieToDelete)
