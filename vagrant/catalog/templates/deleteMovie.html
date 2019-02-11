@@ -1,7 +1,3 @@
-/** 
-* TODO:
-* - fix code that is deleting movies as soon as you click on the delete link.
-*/
 {% extends "main.html" %}
 {% block content %}
 {% include "logoutheader.html" %}
@@ -10,8 +6,8 @@
 
 <form action="#" method="post">
     <button type="submit" class="btn btn-danger" id="submit">Delete</button>
-    <a href='{{url_for('showMovies', genre_type=genre.type)}}''>
-       <button type="submit" class="btn btn-default" id="submit">Cancel</button>
-    </a> 
 </form>
+<a href="{{url_for('showMovies', genre_type=genre.type)}}">
+    <button type="submit" class="btn btn-default" id="submit">Cancel</button>
+</a> 
 {% endblock %}
