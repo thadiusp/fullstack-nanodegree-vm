@@ -3,23 +3,24 @@
 {% include "logoutheader.html" %}
 
 <h1>Add New Movie:</h1>
+<h3>Enter a title and we'll do the rest!</h3>
 
-<form onsubmit="movieInfo()" action="#" id="form" name="form">
-    <div class="form-group">
+<form id="form">
+    <div>
         <label for="title">Title:</label>
-        <input type="text" name="title" maxlength="250" id="title" class="form-control" placeholder="Name of Movie"
-            aria-describedby="helpId">
+        <input type="text" name="title" maxlength="250" id="title" class="form-control" placeholder="Name of Movie">
         <label for="year"></label>
         <input type="text" name="year" maxlength="4" id="year" class="form-control">
         <label for="plot"></label>
         <input type="text" name="plot" maxlength="250" id="plot" class="form-control">
         <label for="poster"></label>
         <input type="text" name="poster" maxlength="250" id="poster" class="form-control">
-        <button type="submit" class="btn btn-default"><span aria-hidden="true"></span>Create</button>
+        <input type="button" value="Add Movie" id="selectMovie" class="btn btn-default">
     </div>
 
 </form>
 <script>
+    const button = document.getElementById('selectMovie')
     const apikey = 'ce21af22'
     const url = 'https://www.omdbapi.com/?t='
     let year;
@@ -42,6 +43,8 @@
             })
             .catch(console.error)
     }
+
+    button.addEventListener('click', movieInfo)
 </script>
 
 {% endblock %}
