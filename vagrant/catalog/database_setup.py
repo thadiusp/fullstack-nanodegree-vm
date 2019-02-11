@@ -8,6 +8,7 @@ Base = declarative_base()
 
 class User(Base):
     __tablename__ = 'user'
+
     id = Column(Integer, primary_key=True)
     name = Column(String(250), nullable=False)
     email = Column(String(250), nullable=False)
@@ -19,7 +20,7 @@ class User(Base):
             'id': self.id,
             'name': self.name,
             'email': self.email,
-            'picture': self.picture
+            'picture': self.picture,
         }
 
 
@@ -34,7 +35,7 @@ class Genre(Base):
     def serialize(self):
         return {
             'id': self.id,
-            'type': self.type
+            'type': self.type,
         }
 
 
@@ -57,7 +58,7 @@ class Movies(Base):
             'title': self.title,
             'year': self.year,
             'plot': self.plot,
-            'poster': self.poster
+            'poster': self.poster,
         }
 
 

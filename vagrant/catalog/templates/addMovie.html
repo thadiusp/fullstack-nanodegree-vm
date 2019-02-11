@@ -9,11 +9,10 @@
     <div style="display: grid; grid-template-columns: repeat(4, 1fr); grid-template-rows: auto; grid-gap: 15px;">
         {% for movie in movies %}
         <div>
-            <h2>{{movie.title}} <font size="3.5px">({{movie.year}})</font></h2>
+            <h2>{{movie.title}} <font size="3.5px">({{movie.year}})</font>
+            </h2>
             <img src="{{movie.poster}}" width="182px" height="268px">
             <p>{{movie.plot}}</p>
-            <a href='{{url_for('editMovie', movie_id=movie.id, genre_type=genre.type)}}'>Edit</a>
-            <a href='{{url_for('deleteMovie', movie_id=movie.id, genre_type=genre.type)}}'>Delete</a>
         </div>
         {% endfor %}
         {% endblock %}
